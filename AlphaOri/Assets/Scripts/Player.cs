@@ -6,13 +6,11 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
 	public bool isGrounded;
-	public bool isRunning;
 
 	private Transform cam;
 	private World world;
 
-	public float walkSpeed = 3f;
-	public float runSpeed = 6f;
+	public float walkSpeed = 6f;
 	public float jumpForce = 5f;
 	public float gravity = -9.8f;
 
@@ -41,21 +39,17 @@ public class Player : MonoBehaviour
 		Cursor.lockState = CursorLockMode.Locked;
 	}
 
-	private void FixedUpdate()
-	{
-		CalculateVelocity();
-		if (jumpRequest)
-			Jump();
-	
-		transform.Translate(velocity, Space.World);
-	}
-
 	private void Update()
 	{
 		GetPlayerInputs();
+		CalculateVelocity();
 
 		transform.Rotate(Vector3.up * mouseHorizontal * mouseSpeed);
 		cam.Rotate(Vector3.right * -mouseVertical * mouseSpeed);
+		transform.Translate(velocity, Space.World);
+
+		if (jumpRequest)
+			Jump();
 
 		placeCursorBlocks();
 	}
@@ -71,16 +65,12 @@ public class Player : MonoBehaviour
 	{
 		// Affect vertical momentum with gravity.
 		if (verticalMomentum > gravity)
-			verticalMomentum += Time.fixedDeltaTime * gravity;
+			verticalMomentum += Time.deltaTime * gravity;
 
-		// if we're runnning, use the run multiplier.
-		if (isRunning)
-			velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * runSpeed;
-		else
-			velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * walkSpeed;
+		velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.deltaTime * walkSpeed;
 
 		// Apply vertical momentum (falling/jumping).
-		velocity += Vector3.up * verticalMomentum * Time.fixedDeltaTime;
+		velocity += Vector3.up * verticalMomentum * Time.deltaTime;
 
 		if ((velocity.z > 0 && front) || (velocity.z < 0 && back))
 			velocity.z = 0;
@@ -99,12 +89,6 @@ public class Player : MonoBehaviour
 		vertical = Input.GetAxis("Vertical");
 		mouseHorizontal = Input.GetAxisRaw("Mouse X");
 		mouseVertical = Input.GetAxisRaw("Mouse Y");
-
-		if (Input.GetButtonDown("Run"))
-			isRunning = true;
-
-		if (Input.GetButtonUp("Run"))
-			isRunning = false;
 
 		if (isGrounded && Input.GetButtonDown("Jump"))
 			jumpRequest = true;

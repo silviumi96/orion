@@ -77,8 +77,6 @@ public class World : MonoBehaviour {
                 UpdateChunks();
 
         }
-
-        Debug.Log("FPS: " + (1.0f / Time.deltaTime));
     }
 
     void GenerateWorld () {
