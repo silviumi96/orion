@@ -34,11 +34,6 @@ public class World : MonoBehaviour {
 
     Queue<Queue<VoxelMod>> modifications = new Queue<Queue<VoxelMod>>();
 
-    private bool _inUI = false;
-
-    public GameObject creativeInventoryWindow;
-    public GameObject cursorSlot;
-
     Thread ChunkUpdateThread;
     public object ChunkUpdateThreadLock = new object();
 
@@ -54,7 +49,6 @@ public class World : MonoBehaviour {
         spawnPosition = new Vector3((VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f, VoxelData.ChunkHeight - 50f, (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f);
         GenerateWorld();
         playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
-
     }
 
     private void Update() {
@@ -83,6 +77,8 @@ public class World : MonoBehaviour {
                 UpdateChunks();
 
         }
+
+        Debug.Log("FPS: " + (1.0f / Time.deltaTime));
     }
 
     void GenerateWorld () {

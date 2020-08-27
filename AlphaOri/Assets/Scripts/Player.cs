@@ -5,15 +5,14 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-
 	public bool isGrounded;
-	public bool isSprinting;
+	public bool isRunning;
 
 	private Transform cam;
 	private World world;
 
 	public float walkSpeed = 3f;
-	public float sprintSpeed = 6f;
+	public float runSpeed = 6f;
 	public float jumpForce = 5f;
 	public float gravity = -9.8f;
 
@@ -24,6 +23,7 @@ public class Player : MonoBehaviour
 	private float vertical;
 	private float mouseHorizontal;
 	private float mouseVertical;
+	private float mouseSpeed = 2;
 	private Vector3 velocity;
 	private float verticalMomentum = 0;
 	private bool jumpRequest;
@@ -46,15 +46,17 @@ public class Player : MonoBehaviour
 		CalculateVelocity();
 		if (jumpRequest)
 			Jump();
-
-		transform.Rotate(Vector3.up * mouseHorizontal);
-		cam.Rotate(Vector3.right * -mouseVertical);
+	
 		transform.Translate(velocity, Space.World);
 	}
 
 	private void Update()
 	{
 		GetPlayerInputs();
+
+		transform.Rotate(Vector3.up * mouseHorizontal * mouseSpeed);
+		cam.Rotate(Vector3.right * -mouseVertical * mouseSpeed);
+
 		placeCursorBlocks();
 	}
 
@@ -67,14 +69,13 @@ public class Player : MonoBehaviour
 
 	private void CalculateVelocity()
 	{
-
 		// Affect vertical momentum with gravity.
 		if (verticalMomentum > gravity)
 			verticalMomentum += Time.fixedDeltaTime * gravity;
 
-		// if we're sprinting, use the sprint multiplier.
-		if (isSprinting)
-			velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * sprintSpeed;
+		// if we're runnning, use the run multiplier.
+		if (isRunning)
+			velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * runSpeed;
 		else
 			velocity = ((transform.forward * vertical) + (transform.right * horizontal)) * Time.fixedDeltaTime * walkSpeed;
 
@@ -90,29 +91,26 @@ public class Player : MonoBehaviour
 			velocity.y = checkDownSpeed(velocity.y);
 		else if (velocity.y > 0)
 			velocity.y = checkUpSpeed(velocity.y);
-
-
 	}
 
 	private void GetPlayerInputs()
 	{
-
 		horizontal = Input.GetAxis("Horizontal");
 		vertical = Input.GetAxis("Vertical");
-		mouseHorizontal = Input.GetAxis("Mouse X");
-		mouseVertical = Input.GetAxis("Mouse Y");
+		mouseHorizontal = Input.GetAxisRaw("Mouse X");
+		mouseVertical = Input.GetAxisRaw("Mouse Y");
 
-		if (Input.GetButtonDown("Sprint"))
-			isSprinting = true;
-		if (Input.GetButtonUp("Sprint"))
-			isSprinting = false;
+		if (Input.GetButtonDown("Run"))
+			isRunning = true;
+
+		if (Input.GetButtonUp("Run"))
+			isRunning = false;
 
 		if (isGrounded && Input.GetButtonDown("Jump"))
 			jumpRequest = true;
 
 		if (highlightBlock.gameObject.activeSelf)
 		{
-
 			// Destroy block.
 			if (Input.GetMouseButtonDown(0))
 				world.GetChunkFromVector3(highlightBlock.position).EditVoxel(highlightBlock.position, 0);
@@ -123,18 +121,15 @@ public class Player : MonoBehaviour
 				//ToDo
 			}
 		}
-
 	}
 
 	private void placeCursorBlocks()
 	{
-
 		float step = checkIncrement;
 		Vector3 lastPos = new Vector3();
 
 		while (step < reach)
 		{
-
 			Vector3 pos = cam.position + (cam.forward * step);
 
 			if (world.CheckForVoxel(pos))
@@ -158,12 +153,10 @@ public class Player : MonoBehaviour
 
 		highlightBlock.gameObject.SetActive(false);
 		placeBlock.gameObject.SetActive(false);
-
 	}
 
 	private float checkDownSpeed(float downSpeed)
 	{
-
 		if (
 			world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
 			world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + downSpeed, transform.position.z - playerWidth)) ||
@@ -171,24 +164,18 @@ public class Player : MonoBehaviour
 			world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + downSpeed, transform.position.z + playerWidth))
 		   )
 		{
-
 			isGrounded = true;
 			return 0;
-
 		}
 		else
 		{
-
 			isGrounded = false;
 			return downSpeed;
-
 		}
-
 	}
 
 	private float checkUpSpeed(float upSpeed)
 	{
-
 		if (
 			world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
 			world.CheckForVoxel(new Vector3(transform.position.x + playerWidth, transform.position.y + 2f + upSpeed, transform.position.z - playerWidth)) ||
@@ -196,22 +183,16 @@ public class Player : MonoBehaviour
 			world.CheckForVoxel(new Vector3(transform.position.x - playerWidth, transform.position.y + 2f + upSpeed, transform.position.z + playerWidth))
 		   )
 		{
-
 			return 0;
-
 		}
 		else
 		{
-
 			return upSpeed;
-
 		}
-
 	}
 
 	public bool front
 	{
-
 		get
 		{
 			if (
@@ -222,11 +203,10 @@ public class Player : MonoBehaviour
 			else
 				return false;
 		}
-
 	}
+
 	public bool back
 	{
-
 		get
 		{
 			if (
@@ -237,11 +217,10 @@ public class Player : MonoBehaviour
 			else
 				return false;
 		}
-
 	}
+
 	public bool left
 	{
-
 		get
 		{
 			if (
@@ -252,11 +231,10 @@ public class Player : MonoBehaviour
 			else
 				return false;
 		}
-
 	}
+
 	public bool right
 	{
-
 		get
 		{
 			if (
@@ -267,7 +245,5 @@ public class Player : MonoBehaviour
 			else
 				return false;
 		}
-
 	}
-
 }

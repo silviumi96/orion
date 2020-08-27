@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Chunk
 {
-
 	public ChunkCoord coord;
 
 	GameObject chunkObject;
@@ -31,15 +30,12 @@ public class Chunk
 
 	public Chunk(ChunkCoord _coord, World _world)
 	{
-
 		coord = _coord;
 		world = _world;
-
 	}
 
 	public void Init()
 	{
-
 		chunkObject = new GameObject();
 		meshFilter = chunkObject.AddComponent<MeshFilter>();
 		meshRenderer = chunkObject.AddComponent<MeshRenderer>();
