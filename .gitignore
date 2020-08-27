@@ -2,13 +2,13 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
 #
-/CombatSystemV2/[Ll]ibrary/
-/CombatSystemV2/[Tt]emp/
-/CombatSystemV2/[Oo]bj/
-/CombatSystemV2/[Bb]uild/
-/CombatSystemV2/[Bb]uilds/
-/CombatSystemV2/[Ll]ogs/
-/CombatSystemV2/[Mm]emoryCaptures/
+/AlphaOri/[Ll]ibrary/
+/AlphaOri/[Tt]emp/
+/AlphaOri/[Oo]bj/
+/AlphaOri/[Bb]uild/
+/AlphaOri/[Bb]uilds/
+/AlphaOri/[Ll]ogs/
+/AlphaOri/[Mm]emoryCaptures/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
