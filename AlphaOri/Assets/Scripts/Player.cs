@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
 	private Transform cam;
 	private World world;
 
-	public float walkSpeed = 6f;
+	public float walkSpeed = 10f;
 	public float jumpForce = 5f;
 	public float gravity = -9.8f;
 
@@ -85,13 +85,19 @@ public class Player : MonoBehaviour
 
 	private void GetPlayerInputs()
 	{
-		horizontal = Input.GetAxis("Horizontal");
-		vertical = Input.GetAxis("Vertical");
 		mouseHorizontal = Input.GetAxisRaw("Mouse X");
 		mouseVertical = Input.GetAxisRaw("Mouse Y");
 
-		if (isGrounded && Input.GetButtonDown("Jump"))
-			jumpRequest = true;
+		if (isGrounded)
+		{
+			horizontal = Input.GetAxisRaw("Horizontal");
+			vertical = Input.GetAxisRaw("Vertical");
+
+			if (Input.GetButtonDown("Jump"))
+			{
+				jumpRequest = true;
+			}
+		}
 
 		if (highlightBlock.gameObject.activeSelf)
 		{

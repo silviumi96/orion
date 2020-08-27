@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 675b19a125f9db24fb227eee476a3aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 1234
+  seed: 996
   biome: {fileID: 11400000, guid: 02049af79bea41c4b95708510689f354, type: 2}
   enableThreading: 1
   player: {fileID: 2066153008}
@@ -290,8 +290,6 @@ MonoBehaviour:
     bottomFaceTexture: 16
     leftFaceTexture: 16
     rightFaceTexture: 16
-  creativeInventoryWindow: {fileID: 0}
-  cursorSlot: {fileID: 0}
 --- !u!4 &215957293
 Transform:
   m_ObjectHideFlags: 0
@@ -915,11 +913,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGrounded: 0
-  isRunning: 0
-  walkSpeed: 3
-  runSpeed: 6
-  jumpForce: 5
-  gravity: -9.8
+  walkSpeed: 8
+  jumpForce: 7
+  gravity: -15
   playerWidth: 0.15
   boundsTolerance: 0.1
   highlightBlock: {fileID: 1889892093}

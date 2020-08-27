@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "BiomeAttributes", menuName = "MinecraftTutorial/Biome Attribute")]
+[CreateAssetMenu(fileName = "BiomeAttributes", menuName = "Biomes/Biome Attribute")]
 public class BiomeAttributes : ScriptableObject {
 
-    public string biomeName;
+    public string Name;
 
     public int solidGroundHeight;
     public int terrainHeight;
