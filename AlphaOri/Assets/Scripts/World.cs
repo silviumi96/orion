@@ -12,11 +12,6 @@ public class World : MonoBehaviour {
     [Header("Performance")]
     public bool enableThreading;
 
-    [Range(0f, 1f)]
-    public float globalLightLevel;
-    public Color day;
-    public Color night;
-
     public Transform player;
     public Vector3 spawnPosition;
 
@@ -41,8 +36,6 @@ public class World : MonoBehaviour {
 
     private bool _inUI = false;
 
-    public GameObject debugScreen;
-
     public GameObject creativeInventoryWindow;
     public GameObject cursorSlot;
 
@@ -52,9 +45,6 @@ public class World : MonoBehaviour {
     private void Start() {
 
         Random.InitState(seed);
-
-        Shader.SetGlobalFloat("minGlobalLightLevel", VoxelData.minLightLevel);
-        Shader.SetGlobalFloat("maxGlobalLightLevel", VoxelData.maxLightLevel);
 
         if (enableThreading) {
             ChunkUpdateThread = new Thread(new ThreadStart(ThreadedUpdate));
@@ -71,9 +61,6 @@ public class World : MonoBehaviour {
 
         playerChunkCoord = GetChunkCoordFromVector3(player.position);
 
-        Shader.SetGlobalFloat("GlobalLightLevel", globalLightLevel);
-        Camera.main.backgroundColor = Color.Lerp(night, day, globalLightLevel);
-
         // Only update the chunks if the player has moved from the chunk they were previously on.
         if (!playerChunkCoord.Equals(playerLastChunkCoord))
             CheckViewDistance();
@@ -85,7 +72,6 @@ public class World : MonoBehaviour {
 
             if (chunksToDraw.Peek().isEditable)
                 chunksToDraw.Dequeue().CreateMesh();
-
         }
 
         if (!enableThreading) {
@@ -97,11 +83,6 @@ public class World : MonoBehaviour {
                 UpdateChunks();
 
         }
-     
-        if (Input.GetKeyDown(KeyCode.F3))
-            debugScreen.SetActive(!debugScreen.activeSelf);
-
-
     }
 
     void GenerateWorld () {
@@ -286,26 +267,6 @@ public class World : MonoBehaviour {
             return chunks[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos);
 
         return new VoxelState(GetVoxel(pos));
-
-    }
-
-    public bool inUI {
-
-        get { return _inUI; }
-
-        set {
-
-            _inUI = value;
-            if (_inUI) {
-                Cursor.lockState = CursorLockMode.None;
-                creativeInventoryWindow.SetActive(true);
-                cursorSlot.SetActive(true);
-            } else {
-                Cursor.lockState = CursorLockMode.Locked;
-                creativeInventoryWindow.SetActive(false);
-                cursorSlot.SetActive(false);
-            }
-        }
 
     }
 
