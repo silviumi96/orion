@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "BiomeAttributes", menuName = "Biomes/Biome Attribute")]
 public class BiomeAttributes : ScriptableObject {
@@ -28,8 +26,8 @@ public class BiomeAttributes : ScriptableObject {
 }
 
 [System.Serializable]
-public class Lode {
-
+public class Lode 
+{
     public string nodeName;
     public byte blockID;
     public int minHeight;
@@ -37,6 +35,4 @@ public class Lode {
     public float scale;
     public float threshold;
     public float noiseOffset;
-
-
 }
