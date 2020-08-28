@@ -152,13 +152,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 996
   biome: {fileID: 11400000, guid: 02049af79bea41c4b95708510689f354, type: 2}
-  enableThreading: 1
   player: {fileID: 2066153008}
   spawnPosition: {x: 0, y: 0, z: 0}
   material: {fileID: 2100000, guid: 82082689290290d429ef5be65ab79789, type: 2}
   transparentMaterial: {fileID: 2100000, guid: 147d1663e6b69aa4e99eb4564285a7c5, type: 2}
   blocktypes:
-  - blockName: Air
+  - Name: 
     isSolid: 0
     renderNeighborFaces: 1
     transparency: 1
@@ -169,7 +168,7 @@ MonoBehaviour:
     bottomFaceTexture: 0
     leftFaceTexture: 0
     rightFaceTexture: 0
-  - blockName: Bedrock
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -180,7 +179,7 @@ MonoBehaviour:
     bottomFaceTexture: 9
     leftFaceTexture: 9
     rightFaceTexture: 9
-  - blockName: Stone
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -191,7 +190,7 @@ MonoBehaviour:
     bottomFaceTexture: 0
     leftFaceTexture: 0
     rightFaceTexture: 0
-  - blockName: Grass
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -202,7 +201,7 @@ MonoBehaviour:
     bottomFaceTexture: 1
     leftFaceTexture: 2
     rightFaceTexture: 2
-  - blockName: Sand
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -213,7 +212,7 @@ MonoBehaviour:
     bottomFaceTexture: 10
     leftFaceTexture: 10
     rightFaceTexture: 10
-  - blockName: Dirt
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -224,7 +223,7 @@ MonoBehaviour:
     bottomFaceTexture: 1
     leftFaceTexture: 1
     rightFaceTexture: 1
-  - blockName: Wood
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -235,7 +234,7 @@ MonoBehaviour:
     bottomFaceTexture: 6
     leftFaceTexture: 5
     rightFaceTexture: 5
-  - blockName: Planks
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -246,7 +245,7 @@ MonoBehaviour:
     bottomFaceTexture: 4
     leftFaceTexture: 4
     rightFaceTexture: 4
-  - blockName: Bricks
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -257,7 +256,7 @@ MonoBehaviour:
     bottomFaceTexture: 11
     leftFaceTexture: 11
     rightFaceTexture: 11
-  - blockName: Cobblestone
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 0
     transparency: 0
@@ -268,7 +267,7 @@ MonoBehaviour:
     bottomFaceTexture: 8
     leftFaceTexture: 8
     rightFaceTexture: 8
-  - blockName: Glass
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 1
     transparency: 1
@@ -279,7 +278,7 @@ MonoBehaviour:
     bottomFaceTexture: 3
     leftFaceTexture: 3
     rightFaceTexture: 3
-  - blockName: Leaves
+  - Name: 
     isSolid: 1
     renderNeighborFaces: 1
     transparency: 0.75
