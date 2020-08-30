@@ -20,8 +20,6 @@ public class Chunk
 
 	public VoxelState[,,] voxelMap = new VoxelState[Voxel.CHUNK_LENGTH_IN_VOXELS, Voxel.CHUNK_HEIGHT_IN_VOXELS, Voxel.CHUNK_LENGTH_IN_VOXELS];
 
-	public Queue<VoxelMod> modifications = new Queue<VoxelMod>();
-
 	World world;
 
 	private bool _isActive;
@@ -76,17 +74,6 @@ public class Chunk
 
 	public void UpdateChunk()
 	{
-
-
-		while (modifications.Count > 0)
-		{
-
-			VoxelMod v = modifications.Dequeue();
-			Vector3 pos = v.position -= position;
-			voxelMap[(int)pos.x, (int)pos.y, (int)pos.z].id = v.id;
-
-		}
-
 		ClearMeshData();
 
 		for (int y = 0; y < Voxel.CHUNK_HEIGHT_IN_VOXELS; y++)
@@ -253,13 +240,6 @@ public class Chunk
 
 				AddTexture(world.blocktypes[blockID].GetTextureID(p));
 
-				float lightLevel = neighbor.globalLightPercent;
-
-				colors.Add(new Color(0, 0, 0, lightLevel));
-				colors.Add(new Color(0, 0, 0, lightLevel));
-				colors.Add(new Color(0, 0, 0, lightLevel));
-				colors.Add(new Color(0, 0, 0, lightLevel));
-
 				triangles.Add(vertexIndex);
 				triangles.Add(vertexIndex + 1);
 				triangles.Add(vertexIndex + 2);
@@ -304,17 +284,10 @@ public class Chunk
 
 public class ChunkCoord
 {
-
 	public int x;
 	public int z;
 
-	public ChunkCoord()
-	{
-		x = 0;
-		z = 0;
-	}
-
-	public ChunkCoord(int _x, int _z)
+	public ChunkCoord(int _x = 0, int _z = 0)
 	{
 		x = _x;
 		z = _z;
@@ -344,24 +317,11 @@ public class ChunkCoord
 
 public class VoxelState
 {
-
 	public byte id;
-	public float globalLightPercent;
 
-	public VoxelState()
+	public VoxelState(byte _id = 0)
 	{
-
-		id = 0;
-		globalLightPercent = 0f;
-
-	}
-
-	public VoxelState(byte _id)
-	{
-
 		id = _id;
-		globalLightPercent = 0f;
-
 	}
 
 }

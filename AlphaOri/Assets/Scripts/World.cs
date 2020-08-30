@@ -29,10 +29,6 @@ public class World : MonoBehaviour
 	public List<Chunk> chunksToUpdate = new List<Chunk>();
 	public Queue<Chunk> chunksToDraw = new Queue<Chunk>();
 
-	bool applyingModifications = false;
-
-	Queue<Queue<VoxelMod>> modifications = new Queue<Queue<VoxelMod>>();
-
 	Thread ChunkUpdateThread;
 	public object ChunkUpdateThreadLock = new object();
 
@@ -73,9 +69,6 @@ public class World : MonoBehaviour
 
 		if (!enableThreading)
 		{
-			if (!applyingModifications)
-				ApplyModifications();
-
 			if (chunksToUpdate.Count > 0)
 				UpdateChunks();
 
@@ -145,9 +138,6 @@ public class World : MonoBehaviour
 		while (true)
 		{
 
-			if (!applyingModifications)
-				ApplyModifications();
-
 			if (chunksToUpdate.Count > 0)
 				UpdateChunks();
 
@@ -162,38 +152,6 @@ public class World : MonoBehaviour
 		{
 			ChunkUpdateThread.Abort();
 		}
-
-	}
-
-	void ApplyModifications()
-	{
-
-		applyingModifications = true;
-
-		while (modifications.Count > 0)
-		{
-
-			Queue<VoxelMod> queue = modifications.Dequeue();
-
-			while (queue.Count > 0)
-			{
-
-				VoxelMod v = queue.Dequeue();
-
-				ChunkCoord c = GetChunkCoordFromVector3(v.position);
-
-				if (chunks[c.x, c.z] == null)
-				{
-					chunks[c.x, c.z] = new Chunk(c, this);
-					chunksToCreate.Add(c);
-				}
-
-				chunks[c.x, c.z].modifications.Enqueue(v);
-
-			}
-		}
-
-		applyingModifications = false;
 
 	}
 
@@ -306,21 +264,17 @@ public class World : MonoBehaviour
 		if (yPos == 0)
 			return 1;
 
-		/* BASIC TERRAIN PASS */
-
 		int terrainHeight = Mathf.FloorToInt(biome.terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.terrainScale)) + biome.solidGroundHeight;
 		byte voxelValue = 0;
 
 		if (yPos == terrainHeight)
 			voxelValue = 3;
 		else if (yPos < terrainHeight && yPos > terrainHeight - 4)
-			voxelValue = 5;
+			voxelValue = 2;
 		else if (yPos > terrainHeight)
 			return 0;
 		else
-			voxelValue = 2;
-
-		/* SECOND PASS */
+			voxelValue = 1;
 
 		if (voxelValue == 2)
 		{
@@ -332,23 +286,6 @@ public class World : MonoBehaviour
 					if (Noise.Get3DPerlin(pos, lode.noiseOffset, lode.scale, lode.threshold))
 						voxelValue = lode.blockID;
 
-			}
-
-		}
-
-		/* TREE PASS */
-
-		if (yPos == terrainHeight)
-		{
-
-			if (Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treeZoneScale) > biome.treeZoneThreshold)
-			{
-
-				if (Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.treePlacementScale) > biome.treePlacementThreshold)
-				{
-
-					modifications.Enqueue(Structure.MakeTree(pos, biome.minTreeHeight, biome.maxTreeHeight));
-				}
 			}
 
 		}
@@ -423,30 +360,6 @@ public class VoxelType
 
 
 		}
-
-	}
-
-}
-
-public class VoxelMod
-{
-
-	public Vector3 position;
-	public byte id;
-
-	public VoxelMod()
-	{
-
-		position = new Vector3();
-		id = 0;
-
-	}
-
-	public VoxelMod(Vector3 _position, byte _id)
-	{
-
-		position = _position;
-		id = _id;
 
 	}
 
