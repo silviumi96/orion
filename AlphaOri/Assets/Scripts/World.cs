@@ -9,8 +9,6 @@ public class World : MonoBehaviour
 	public int seed;
 	public BiomeAttributes biome;
 
-	private bool enableThreading;
-
 	public Transform player;
 	public Vector3 spawnPosition;
 
@@ -37,11 +35,10 @@ public class World : MonoBehaviour
 
 		Random.InitState(seed);
 
-		if (enableThreading)
-		{
-			ChunkUpdateThread = new Thread(new ThreadStart(ThreadedUpdate));
-			ChunkUpdateThread.Start();
-		}
+
+		ChunkUpdateThread = new Thread(new ThreadStart(ThreadedUpdate));
+		ChunkUpdateThread.Start();
+
 
 		spawnPosition = new Vector3((Voxel.WORLD_LENGTH_IN_CHUNKS * Voxel.CHUNK_LENGTH_IN_VOXELS) / 2f, Voxel.CHUNK_HEIGHT_IN_VOXELS - 50f, (Voxel.WORLD_LENGTH_IN_CHUNKS * Voxel.CHUNK_LENGTH_IN_VOXELS) / 2f);
 		GenerateWorld();
@@ -62,17 +59,11 @@ public class World : MonoBehaviour
 
 		if (chunksToDraw.Count > 0)
 		{
-
 			if (chunksToDraw.Peek().isEditable)
 				chunksToDraw.Dequeue().CreateMesh();
 		}
 
-		if (!enableThreading)
-		{
-			if (chunksToUpdate.Count > 0)
-				UpdateChunks();
 
-		}
 	}
 
 	void GenerateWorld()
@@ -134,43 +125,30 @@ public class World : MonoBehaviour
 
 	void ThreadedUpdate()
 	{
-
 		while (true)
 		{
-
 			if (chunksToUpdate.Count > 0)
 				UpdateChunks();
-
 		}
-
 	}
 
 	private void OnDisable()
 	{
-
-		if (enableThreading)
-		{
-			ChunkUpdateThread.Abort();
-		}
-
+		ChunkUpdateThread.Abort();
 	}
 
 	ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
 	{
-
 		int x = Mathf.FloorToInt(pos.x / Voxel.CHUNK_LENGTH_IN_VOXELS);
 		int z = Mathf.FloorToInt(pos.z / Voxel.CHUNK_LENGTH_IN_VOXELS);
 		return new ChunkCoord(x, z);
-
 	}
 
 	public Chunk GetChunkFromVector3(Vector3 pos)
 	{
-
 		int x = Mathf.FloorToInt(pos.x / Voxel.CHUNK_LENGTH_IN_VOXELS);
 		int z = Mathf.FloorToInt(pos.z / Voxel.CHUNK_LENGTH_IN_VOXELS);
 		return chunks[x, z];
-
 	}
 
 	void CheckViewDistance()

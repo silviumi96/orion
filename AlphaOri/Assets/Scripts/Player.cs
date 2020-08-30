@@ -2,6 +2,7 @@
 
 public class Player : MonoBehaviour
 {
+	private const int PLACE_BLOCK_ID = 1;
 	public bool isGrounded;
 
 	private Transform cam;
@@ -12,7 +13,6 @@ public class Player : MonoBehaviour
 	public float gravity = -9.8f;
 
 	public float playerWidth = 0.15f;
-	public float boundsTolerance = 0.1f;
 
 	private float horizontal;
 	private float vertical;
@@ -105,7 +105,7 @@ public class Player : MonoBehaviour
 			// Place block.
 			if (Input.GetMouseButtonDown(1))
 			{
-				//ToDo
+				world.GetChunkFromVector3(highlightBlock.position).EditVoxel(placeBlock.position, PLACE_BLOCK_ID);
 			}
 		}
 	}

@@ -225,8 +225,6 @@ public class Chunk
 
 		byte blockID = voxelMap[x, y, z].id;
 
-		// bool isTransparent = world.blocktypes[blockID].renderNeighborFaces;
-
 		for (int p = 0; p < 6; p++)
 		{
 			VoxelState neighbor = CheckVoxel(pos + Voxel.FACES[p]);
