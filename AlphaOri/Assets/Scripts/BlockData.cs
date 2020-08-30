@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
-public static class Voxel
+public static class BlockData
 {
-	public static readonly int CHUNK_LENGTH_IN_VOXELS = 16;
-	public static readonly int CHUNK_HEIGHT_IN_VOXELS = 128;
+	public static readonly int CHUNK_LENGTH_IN_BLOCKS = 16;
+	public static readonly int CHUNK_HEIGHT_IN_BLOCKS = 128;
 
 	public static readonly int WORLD_LENGTH_IN_CHUNKS = 128;
 	public static readonly int VIEW_DISTANCE_IN_CHUNKS = 4;
 
-	public static readonly int ATLAS_LENGTH_IN_VOXELS = 16;
-	public static readonly float ATLAS_SIZE_NORMALIZED = 1f / ATLAS_LENGTH_IN_VOXELS;
+	public static readonly int ATLAS_LENGTH_IN_CELLS = 16;
+	public static readonly float ATLAS_SIZE_NORMALIZED = 1f / ATLAS_LENGTH_IN_CELLS;
 
 	public static readonly Vector3[] VERTICES = new Vector3[8]
 	{
@@ -33,7 +33,7 @@ public static class Voxel
 		{1, 2, 5, 6}
 	};
 
-	public static readonly Vector3[] FACES = new Vector3[6]
+	public static readonly Vector3[] FACE_SCAN_OFFSET = new Vector3[6]
 	{
 		new Vector3(0.0f, 0.0f, -1.0f),
 		new Vector3(0.0f, 0.0f, 1.0f),

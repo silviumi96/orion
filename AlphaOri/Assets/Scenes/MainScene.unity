@@ -150,8 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 675b19a125f9db24fb227eee476a3aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 996
-  biome: {fileID: 11400000, guid: 02049af79bea41c4b95708510689f354, type: 2}
+  Lodes: []
   player: {fileID: 2066153008}
   spawnPosition: {x: 0, y: 0, z: 0}
   material: {fileID: 2100000, guid: 82082689290290d429ef5be65ab79789, type: 2}
@@ -336,7 +335,6 @@ GameObject:
   - component: {fileID: 1452654171}
   - component: {fileID: 1452654174}
   - component: {fileID: 1452654173}
-  - component: {fileID: 1452654172}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -358,19 +356,6 @@ Transform:
   m_Father: {fileID: 1454871628}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1452654172
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1452654170}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1452654173
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -428,7 +413,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1454871628}
   m_Layer: 0
-  m_Name: PlaceHighlight
+  m_Name: SpawnBlockIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,7 +537,6 @@ GameObject:
   - component: {fileID: 1764297605}
   - component: {fileID: 1764297608}
   - component: {fileID: 1764297607}
-  - component: {fileID: 1764297606}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -574,19 +558,6 @@ Transform:
   m_Father: {fileID: 1889892093}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1764297606
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1764297604}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1764297607
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -644,7 +615,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1889892093}
   m_Layer: 0
-  m_Name: DestroyHighlight
+  m_Name: DestroyBlockIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -677,7 +648,7 @@ GameObject:
   - component: {fileID: 1928745953}
   - component: {fileID: 1928745954}
   m_Layer: 5
-  m_Name: Crosshair
+  m_Name: Dot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -867,16 +838,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53bd22f7ea86f864aa7a177c7c391367, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isGrounded: 0
-  walkSpeed: 8
-  jumpForce: 7
-  gravity: -15
-  playerWidth: 0.1
-  boundsTolerance: 0.1
-  highlightBlock: {fileID: 1889892093}
-  placeBlock: {fileID: 1454871628}
-  checkIncrement: 0.08
-  reach: 4
+  destroyBlockIndicator: {fileID: 1889892093}
+  spawnBlockIndicator: {fileID: 1454871628}
+  camera: {fileID: 2065706181}
+  world: {fileID: 215957292}
 --- !u!4 &2066153008
 Transform:
   m_ObjectHideFlags: 0
