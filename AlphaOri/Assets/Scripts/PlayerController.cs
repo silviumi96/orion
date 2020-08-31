@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
 	private Transform camera;
 
 	[SerializeField]
-	private World world;
+	private Level world;
 
 	private void Start()
 	{

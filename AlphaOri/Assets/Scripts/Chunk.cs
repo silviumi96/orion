@@ -20,12 +20,12 @@ public class Chunk
 
 	public VoxelId[,,] voxelMap = new VoxelId[BlockData.CHUNK_LENGTH_IN_BLOCKS, BlockData.CHUNK_HEIGHT_IN_BLOCKS, BlockData.CHUNK_LENGTH_IN_BLOCKS];
 
-	World world;
+	Level world;
 
 	private bool _isActive;
 	private bool isVoxelMapPopulated = false;
 
-	public Chunk(ChunkCoordinates _coord, World _world)
+	public Chunk(ChunkCoordinates _coord, Level _world)
 	{
 		Coordinates = _coord;
 		world = _world;

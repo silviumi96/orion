@@ -2,11 +2,11 @@
 using UnityEngine;
 using System.Threading;
 
-public class World : MonoBehaviour
+public class Level : MonoBehaviour
 {
 	public static readonly int WORLD_SIZE_IN_VOXELS = BlockData.WORLD_LENGTH_IN_CHUNKS * BlockData.CHUNK_LENGTH_IN_BLOCKS;
 
-	private const int SEED = 4444;
+	private const int SEED = 100;
 	private const int GROUND_TO_SURFACE_HEIGHT = 40;
 	private const int SURFACE_TO_SKY_HEIGHT = 40;
 	private const float TERRAIN_SCALE = 0.25f;
@@ -114,17 +114,19 @@ public class World : MonoBehaviour
 				if (chunksToUpdate[index].isEditable)
 				{
 					chunksToUpdate[index].UpdateChunk();
-					activeChunks.Add(chunksToUpdate[index].Coordinates);
+
+					if (!activeChunks.Contains(chunksToUpdate[index].Coordinates))
+					{
+						activeChunks.Add(chunksToUpdate[index].Coordinates);
+					}
+
 					chunksToUpdate.RemoveAt(index);
 					updated = true;
 				}
 				else
 					index++;
-
 			}
-
 		}
-
 	}
 
 	void ThreadedUpdate()
@@ -201,8 +203,8 @@ public class World : MonoBehaviour
 		}
 
 		// Any chunks left in the previousActiveChunks list are no longer in the player's view distance, so loop through and disable them.
-		foreach (ChunkCoordinates c in previouslyActiveChunks)
-			chunks[c.X, c.Z].isActive = false;
+		//foreach (ChunkCoordinates c in previouslyActiveChunks)
+		//	chunks[c.X, c.Z].isActive = false;
 
 	}
 
