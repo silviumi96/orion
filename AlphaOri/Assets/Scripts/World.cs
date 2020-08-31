@@ -23,11 +23,11 @@ public class World : MonoBehaviour
 
 	Chunk[,] chunks = new Chunk[BlockData.WORLD_LENGTH_IN_CHUNKS, BlockData.WORLD_LENGTH_IN_CHUNKS];
 
-	List<ChunkCoord> activeChunks = new List<ChunkCoord>();
-	public ChunkCoord playerChunkCoord;
-	ChunkCoord playerLastChunkCoord;
+	List<ChunkCoordinates> activeChunks = new List<ChunkCoordinates>();
+	public ChunkCoordinates playerChunkCoord;
+	ChunkCoordinates playerLastChunkCoord;
 
-	List<ChunkCoord> chunksToCreate = new List<ChunkCoord>();
+	List<ChunkCoordinates> chunksToCreate = new List<ChunkCoordinates>();
 	public List<Chunk> chunksToUpdate = new List<Chunk>();
 	public Queue<Chunk> chunksToDraw = new Queue<Chunk>();
 
@@ -78,7 +78,7 @@ public class World : MonoBehaviour
 			for (int z = (BlockData.WORLD_LENGTH_IN_CHUNKS / 2) - BlockData.VIEW_DISTANCE_IN_CHUNKS; z < (BlockData.WORLD_LENGTH_IN_CHUNKS / 2) + BlockData.VIEW_DISTANCE_IN_CHUNKS; z++)
 			{
 
-				ChunkCoord newChunk = new ChunkCoord(x, z);
+				ChunkCoordinates newChunk = new ChunkCoordinates(x, z);
 				chunks[x, z] = new Chunk(newChunk, this);
 				chunksToCreate.Add(newChunk);
 
@@ -93,9 +93,9 @@ public class World : MonoBehaviour
 	void CreateChunk()
 	{
 
-		ChunkCoord c = chunksToCreate[0];
+		ChunkCoordinates c = chunksToCreate[0];
 		chunksToCreate.RemoveAt(0);
-		chunks[c.x, c.z].Init();
+		chunks[c.X, c.Z].Init();
 
 	}
 
@@ -114,7 +114,7 @@ public class World : MonoBehaviour
 				if (chunksToUpdate[index].isEditable)
 				{
 					chunksToUpdate[index].UpdateChunk();
-					activeChunks.Add(chunksToUpdate[index].Coordinate);
+					activeChunks.Add(chunksToUpdate[index].Coordinates);
 					chunksToUpdate.RemoveAt(index);
 					updated = true;
 				}
@@ -141,11 +141,11 @@ public class World : MonoBehaviour
 		ChunkUpdateThread.Abort();
 	}
 
-	ChunkCoord GetChunkCoordFromVector3(Vector3 pos)
+	ChunkCoordinates GetChunkCoordFromVector3(Vector3 pos)
 	{
 		int x = Mathf.FloorToInt(pos.x / BlockData.CHUNK_LENGTH_IN_BLOCKS);
 		int z = Mathf.FloorToInt(pos.z / BlockData.CHUNK_LENGTH_IN_BLOCKS);
-		return new ChunkCoord(x, z);
+		return new ChunkCoordinates(x, z);
 	}
 
 	public Chunk GetChunkFromVector3(Vector3 pos)
@@ -158,41 +158,41 @@ public class World : MonoBehaviour
 	void CheckViewDistance()
 	{
 
-		ChunkCoord coord = GetChunkCoordFromVector3(player.position);
+		ChunkCoordinates coord = GetChunkCoordFromVector3(player.position);
 		playerLastChunkCoord = playerChunkCoord;
 
-		List<ChunkCoord> previouslyActiveChunks = new List<ChunkCoord>(activeChunks);
+		List<ChunkCoordinates> previouslyActiveChunks = new List<ChunkCoordinates>(activeChunks);
 
 		activeChunks.Clear();
 
 		// Loop through all chunks currently within view distance of the player.
-		for (int x = coord.x - BlockData.VIEW_DISTANCE_IN_CHUNKS; x < coord.x + BlockData.VIEW_DISTANCE_IN_CHUNKS; x++)
+		for (int x = coord.X - BlockData.VIEW_DISTANCE_IN_CHUNKS; x < coord.X + BlockData.VIEW_DISTANCE_IN_CHUNKS; x++)
 		{
-			for (int z = coord.z - BlockData.VIEW_DISTANCE_IN_CHUNKS; z < coord.z + BlockData.VIEW_DISTANCE_IN_CHUNKS; z++)
+			for (int z = coord.Z - BlockData.VIEW_DISTANCE_IN_CHUNKS; z < coord.Z + BlockData.VIEW_DISTANCE_IN_CHUNKS; z++)
 			{
 
 				// If the current chunk is in the world...
-				if (IsChunkInside(new ChunkCoord(x, z)))
+				if (IsChunkInside(new ChunkCoordinates(x, z)))
 				{
 
 					// Check if it active, if not, activate it.
 					if (chunks[x, z] == null)
 					{
-						chunks[x, z] = new Chunk(new ChunkCoord(x, z), this);
-						chunksToCreate.Add(new ChunkCoord(x, z));
+						chunks[x, z] = new Chunk(new ChunkCoordinates(x, z), this);
+						chunksToCreate.Add(new ChunkCoordinates(x, z));
 					}
 					else if (!chunks[x, z].isActive)
 					{
 						chunks[x, z].isActive = true;
 					}
-					activeChunks.Add(new ChunkCoord(x, z));
+					activeChunks.Add(new ChunkCoordinates(x, z));
 				}
 
 				// Check through previously active chunks to see if this chunk is there. If it is, remove it from the list.
 				for (int i = 0; i < previouslyActiveChunks.Count; i++)
 				{
 
-					if (previouslyActiveChunks[i].Equals(new ChunkCoord(x, z)))
+					if (previouslyActiveChunks[i].Equals(new ChunkCoordinates(x, z)))
 						previouslyActiveChunks.RemoveAt(i);
 
 				}
@@ -201,21 +201,21 @@ public class World : MonoBehaviour
 		}
 
 		// Any chunks left in the previousActiveChunks list are no longer in the player's view distance, so loop through and disable them.
-		foreach (ChunkCoord c in previouslyActiveChunks)
-			chunks[c.x, c.z].isActive = false;
+		foreach (ChunkCoordinates c in previouslyActiveChunks)
+			chunks[c.X, c.Z].isActive = false;
 
 	}
 
 	public bool CheckForVoxel(Vector3 pos)
 	{
 
-		ChunkCoord thisChunk = new ChunkCoord(pos);
+		ChunkCoordinates thisChunk = new ChunkCoordinates(pos);
 
 		if (!IsChunkInside(thisChunk) || pos.y < 0 || pos.y > BlockData.CHUNK_HEIGHT_IN_BLOCKS)
 			return false;
 
-		if (chunks[thisChunk.x, thisChunk.z] != null && chunks[thisChunk.x, thisChunk.z].isEditable)
-			return blocktypes[chunks[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos).id].isSolid;
+		if (chunks[thisChunk.X, thisChunk.Z] != null && chunks[thisChunk.X, thisChunk.Z].isEditable)
+			return blocktypes[chunks[thisChunk.X, thisChunk.Z].GetVoxelFromGlobalVector3(pos).id].isSolid;
 
 		return blocktypes[GetVoxel(pos)].isSolid;
 
@@ -224,13 +224,13 @@ public class World : MonoBehaviour
 	public VoxelId GetVoxelState(Vector3 pos)
 	{
 
-		ChunkCoord thisChunk = new ChunkCoord(pos);
+		ChunkCoordinates thisChunk = new ChunkCoordinates(pos);
 
 		if (!IsChunkInside(thisChunk) || pos.y < 0 || pos.y > BlockData.CHUNK_HEIGHT_IN_BLOCKS)
 			return null;
 
-		if (chunks[thisChunk.x, thisChunk.z] != null && chunks[thisChunk.x, thisChunk.z].isEditable)
-			return chunks[thisChunk.x, thisChunk.z].GetVoxelFromGlobalVector3(pos);
+		if (chunks[thisChunk.X, thisChunk.Z] != null && chunks[thisChunk.X, thisChunk.Z].isEditable)
+			return chunks[thisChunk.X, thisChunk.Z].GetVoxelFromGlobalVector3(pos);
 
 		return new VoxelId(GetVoxel(pos));
 
@@ -273,10 +273,10 @@ public class World : MonoBehaviour
 
 	}
 
-	bool IsChunkInside(ChunkCoord coord)
+	bool IsChunkInside(ChunkCoordinates coord)
 	{
 
-		if (coord.x > 0 && coord.x < BlockData.WORLD_LENGTH_IN_CHUNKS - 1 && coord.z > 0 && coord.z < BlockData.WORLD_LENGTH_IN_CHUNKS - 1)
+		if (coord.X > 0 && coord.X < BlockData.WORLD_LENGTH_IN_CHUNKS - 1 && coord.Z > 0 && coord.Z < BlockData.WORLD_LENGTH_IN_CHUNKS - 1)
 			return true;
 		else
 			return

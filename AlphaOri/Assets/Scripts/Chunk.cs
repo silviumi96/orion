@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class Chunk
 {
-	public ChunkCoord Coordinate;
+	public ChunkCoordinates Coordinates;
 
-	GameObject chunkObject;
-	MeshRenderer meshRenderer;
-	MeshFilter meshFilter;
+	private GameObject gameObject;
+	private MeshFilter meshFilter;
+	private MeshRenderer meshRenderer;
 
 	int vertexIndex = 0;
 	List<Vector3> vertices = new List<Vector3>();
@@ -25,24 +25,24 @@ public class Chunk
 	private bool _isActive;
 	private bool isVoxelMapPopulated = false;
 
-	public Chunk(ChunkCoord _coord, World _world)
+	public Chunk(ChunkCoordinates _coord, World _world)
 	{
-		Coordinate = _coord;
+		Coordinates = _coord;
 		world = _world;
 	}
 
 	public void Init()
 	{
-		chunkObject = new GameObject();
-		meshFilter = chunkObject.AddComponent<MeshFilter>();
-		meshRenderer = chunkObject.AddComponent<MeshRenderer>();
+		gameObject = new GameObject();
+		meshFilter = gameObject.AddComponent<MeshFilter>();
+		meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
 		meshRenderer.material = world.material;
 
-		chunkObject.transform.SetParent(world.transform);
-		chunkObject.transform.position = new Vector3(Coordinate.x * BlockData.CHUNK_LENGTH_IN_BLOCKS, 0f, Coordinate.z * BlockData.CHUNK_LENGTH_IN_BLOCKS);
-		chunkObject.name = "Chunk " + Coordinate.x + ", " + Coordinate.z;
-		position = chunkObject.transform.position;
+		gameObject.transform.SetParent(world.transform);
+		gameObject.transform.position = new Vector3(Coordinates.X * BlockData.CHUNK_LENGTH_IN_BLOCKS, 0f, Coordinates.Z * BlockData.CHUNK_LENGTH_IN_BLOCKS);
+		gameObject.name = "Chunk " + Coordinates.X + ", " + Coordinates.Z;
+		position = gameObject.transform.position;
 
 		PopulateVoxelMap();
 	}
@@ -115,8 +115,8 @@ public class Chunk
 		{
 
 			_isActive = value;
-			if (chunkObject != null)
-				chunkObject.SetActive(value);
+			if (gameObject != null)
+				gameObject.SetActive(value);
 
 		}
 
@@ -154,8 +154,8 @@ public class Chunk
 		int yCheck = Mathf.FloorToInt(pos.y);
 		int zCheck = Mathf.FloorToInt(pos.z);
 
-		xCheck -= Mathf.FloorToInt(chunkObject.transform.position.x);
-		zCheck -= Mathf.FloorToInt(chunkObject.transform.position.z);
+		xCheck -= Mathf.FloorToInt(gameObject.transform.position.x);
+		zCheck -= Mathf.FloorToInt(gameObject.transform.position.z);
 
 		voxelMap[xCheck, yCheck, zCheck].id = newID;
 
@@ -280,36 +280,29 @@ public class Chunk
 	}
 }
 
-public class ChunkCoord
+public class ChunkCoordinates
 {
-	public int x;
-	public int z;
+	public int X { get; private set; }
+	public int Z { get; private set; }
 
-	public ChunkCoord(int _x = 0, int _z = 0)
+	public ChunkCoordinates(int x = 0, int z = 0)
 	{
-		x = _x;
-		z = _z;
+		X = x;
+		Z = z;
 	}
 
-	public ChunkCoord(Vector3 pos)
+	public ChunkCoordinates(Vector3 position)
 	{
-
-		int xCheck = Mathf.FloorToInt(pos.x);
-		int zCheck = Mathf.FloorToInt(pos.z);
-
-		x = xCheck / BlockData.CHUNK_LENGTH_IN_BLOCKS;
-		z = zCheck / BlockData.CHUNK_LENGTH_IN_BLOCKS;
-
+		X = Mathf.FloorToInt(position.x) / BlockData.CHUNK_LENGTH_IN_BLOCKS;
+		Z = Mathf.FloorToInt(position.z) / BlockData.CHUNK_LENGTH_IN_BLOCKS;
 	}
 
-	public bool Equals(ChunkCoord other)
+	public bool Equals(ChunkCoordinates coordinates)
 	{
-		if (other == null)
-			return false;
-		else if (other.x == x && other.z == z)
+		if (coordinates.X == X && coordinates.Z == Z && coordinates == null)
 			return true;
-		else
-			return false;
+
+		return false;
 	}
 }
 

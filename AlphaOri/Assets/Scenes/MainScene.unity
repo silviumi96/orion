@@ -840,8 +840,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyBlockIndicator: {fileID: 1889892093}
   spawnBlockIndicator: {fileID: 1454871628}
-  camera: {fileID: 2065706181}
+  camera: {fileID: 1616302746}
   world: {fileID: 215957292}
+  spawnBlockId: 1
 --- !u!4 &2066153008
 Transform:
   m_ObjectHideFlags: 0

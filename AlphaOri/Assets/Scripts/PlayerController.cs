@@ -2,6 +2,8 @@
 
 public class PlayerController : MonoBehaviour
 {
+	private const float COLLIDER_HEIGHT = 2f;
+	private const float HALF_COLLIDER_HEIGHT = 1f;
 	private const float COLLIDER_WIDTH = 0.15f;
 	private const float REACH_DISTANCE = 8f;
 	private const float RAYCAST_STEP = 0.1f;
@@ -9,7 +11,7 @@ public class PlayerController : MonoBehaviour
 	private const float SPEED = 10f;
 	private const float JUMP_VELOCITY = 8f;
 	private const float GRAVITY = -15f;
-	private const int SPAWN_BLOCK_ID = 1;
+	private const byte SPAWN_BLOCK_ID = 1;
 
 	private float moveX;
 	private float moveZ;
@@ -48,38 +50,9 @@ public class PlayerController : MonoBehaviour
 		transform.Translate(velocity, Space.World);
 
 		if (shouldJump)
-			Jump();
+			InitiateJump();
 
-		placeCursorBlocks();
-	}
-
-	void Jump()
-	{
-		verticalVelocity = JUMP_VELOCITY;
-		isGrounded = false;
-		shouldJump = false;
-	}
-
-	private void ComputeVelocity()
-	{
-		// Affect vertical momentum with gravity.
-		if (verticalVelocity > GRAVITY)
-			verticalVelocity += Time.deltaTime * GRAVITY;
-
-		velocity = ((transform.forward * moveZ) + (transform.right * moveX)) * Time.deltaTime * SPEED;
-
-		// Apply vertical momentum (falling/jumping).
-		velocity += Vector3.up * verticalVelocity * Time.deltaTime;
-
-		if ((velocity.z > 0 && front) || (velocity.z < 0 && back))
-			velocity.z = 0;
-		if ((velocity.x > 0 && right) || (velocity.x < 0 && left))
-			velocity.x = 0;
-
-		if (velocity.y < 0)
-			velocity.y = checkDownSpeed(velocity.y);
-		else if (velocity.y > 0)
-			velocity.y = checkUpSpeed(velocity.y);
+		UpdateRaycast();
 	}
 
 	private void GetInput()
@@ -100,58 +73,102 @@ public class PlayerController : MonoBehaviour
 
 		if (destroyBlockIndicator.gameObject.activeSelf)
 		{
-			// Destroy block.
 			if (Input.GetMouseButtonDown(0))
 				world.GetChunkFromVector3(destroyBlockIndicator.position).EditVoxel(destroyBlockIndicator.position, 0);
 
-			// Place block.
 			if (Input.GetMouseButtonDown(1))
 			{
-				world.GetChunkFromVector3(destroyBlockIndicator.position).EditVoxel(spawnBlockIndicator.position, SPAWN_BLOCK_ID);
+				world.GetChunkFromVector3(spawnBlockIndicator.position).EditVoxel(spawnBlockIndicator.position, SPAWN_BLOCK_ID);
 			}
 		}
 	}
 
-	private void placeCursorBlocks()
+	private void ComputeVelocity()
 	{
-		float step = RAYCAST_STEP;
-		Vector3 lastPos = new Vector3();
+		if (verticalVelocity > GRAVITY)
+			verticalVelocity += GRAVITY * Time.deltaTime;
 
-		while (step < REACH_DISTANCE)
+		velocity = ((transform.forward * moveZ) + (transform.right * moveX)) * SPEED * Time.deltaTime;
+		velocity += Vector3.up * verticalVelocity * Time.deltaTime;
+
+		if (velocity.y < 0)
+			velocity.y = CheckVelocityDownwards(velocity.y);
+		else if (velocity.y > 0)
+			velocity.y = CheckVelocityUpwards(velocity.y);
+
+		if ((velocity.z > 0 && CheckCollisionFront()) || (velocity.z < 0 && CheckCollisionBack()))
+			velocity.z = 0;
+		if ((velocity.x > 0 && CheckCollisionRight()) || (velocity.x < 0 && CheckCollisionLeft()))
+			velocity.x = 0;
+	}
+
+	public bool CheckCollisionRight()
+	{
+
+		if (world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y, transform.position.z)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + HALF_COLLIDER_HEIGHT, transform.position.z))
+		)
+			return true;
+		else
+			return false;
+
+	}
+
+	public bool CheckCollisionLeft()
+	{
+
+		if (world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y, transform.position.z)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + HALF_COLLIDER_HEIGHT, transform.position.z))
+		)
+			return true;
+		else
+			return false;
+
+	}
+
+	private bool CheckCollisionFront()
+	{
+		if (world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y, transform.position.z + COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + HALF_COLLIDER_HEIGHT, transform.position.z + COLLIDER_WIDTH))
+		)
+			return true;
+		else
+			return false;
+	}
+
+	public bool CheckCollisionBack()
+	{
+		if (world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y, transform.position.z - COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + HALF_COLLIDER_HEIGHT, transform.position.z - COLLIDER_WIDTH))
+		)
+			return true;
+		else
+			return false;
+	}
+
+	private float CheckVelocityUpwards(float velocityY)
+	{
+		if (world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + COLLIDER_HEIGHT + velocityY, transform.position.z - COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + COLLIDER_HEIGHT + velocityY, transform.position.z - COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + COLLIDER_HEIGHT + velocityY, transform.position.z + COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + COLLIDER_HEIGHT + velocityY, transform.position.z + COLLIDER_WIDTH))
+		)
 		{
-			Vector3 pos = camera.position + (camera.forward * step);
-
-			if (world.CheckForVoxel(pos))
-			{
-
-				destroyBlockIndicator.position = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
-				spawnBlockIndicator.position = lastPos;
-
-				destroyBlockIndicator.gameObject.SetActive(true);
-				spawnBlockIndicator.gameObject.SetActive(true);
-
-				return;
-
-			}
-
-			lastPos = new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
-
-			step += RAYCAST_STEP;
-
+			return 0;
 		}
-
-		destroyBlockIndicator.gameObject.SetActive(false);
-		spawnBlockIndicator.gameObject.SetActive(false);
+		else
+		{
+			return velocityY;
+		}
 	}
 
-	private float checkDownSpeed(float downSpeed)
+	private float CheckVelocityDownwards(float velocityY)
 	{
-		if (
-			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + downSpeed, transform.position.z - COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + downSpeed, transform.position.z - COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + downSpeed, transform.position.z + COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + downSpeed, transform.position.z + COLLIDER_WIDTH))
-		   )
+		if (world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + velocityY, transform.position.z - COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + velocityY, transform.position.z - COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + velocityY, transform.position.z + COLLIDER_WIDTH)) ||
+			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + velocityY, transform.position.z + COLLIDER_WIDTH))
+		)
 		{
 			isGrounded = true;
 			return 0;
@@ -159,80 +176,45 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			isGrounded = false;
-			return downSpeed;
+			return velocityY;
 		}
 	}
 
-	private float checkUpSpeed(float upSpeed)
+	void InitiateJump()
 	{
-		if (
-			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + 2f + upSpeed, transform.position.z - COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + 2f + upSpeed, transform.position.z - COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + 2f + upSpeed, transform.position.z + COLLIDER_WIDTH)) ||
-			world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + 2f + upSpeed, transform.position.z + COLLIDER_WIDTH))
-		   )
-		{
-			return 0;
-		}
-		else
-		{
-			return upSpeed;
-		}
+		verticalVelocity = JUMP_VELOCITY;
+		isGrounded = false;
+		shouldJump = false;
 	}
 
-	public bool front
+	private void UpdateRaycast()
 	{
-		get
+		var currentPosition = new Vector3();
+		var previousPosition = new Vector3();
+		var step = RAYCAST_STEP;
+		
+		while (step < REACH_DISTANCE)
 		{
-			if (
-				world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y, transform.position.z + COLLIDER_WIDTH)) ||
-				world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z + COLLIDER_WIDTH))
-				)
-				return true;
-			else
-				return false;
-		}
-	}
+			currentPosition = camera.position + (camera.forward * step);
 
-	public bool back
-	{
-		get
-		{
-			if (
-				world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y, transform.position.z - COLLIDER_WIDTH)) ||
-				world.CheckForVoxel(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z - COLLIDER_WIDTH))
-				)
-				return true;
-			else
-				return false;
-		}
-	}
+			if (world.CheckForVoxel(currentPosition))
+			{
+				spawnBlockIndicator.gameObject.SetActive(true);
+				destroyBlockIndicator.gameObject.SetActive(true);
 
-	public bool left
-	{
-		get
-		{
-			if (
-				world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y, transform.position.z)) ||
-				world.CheckForVoxel(new Vector3(transform.position.x - COLLIDER_WIDTH, transform.position.y + 1f, transform.position.z))
-				)
-				return true;
-			else
-				return false;
-		}
-	}
+				spawnBlockIndicator.position = previousPosition;
+				destroyBlockIndicator.position = new Vector3(Mathf.FloorToInt(currentPosition.x), Mathf.FloorToInt(currentPosition.y), Mathf.FloorToInt(currentPosition.z));
+				return;
+			}
 
-	public bool right
-	{
-		get
-		{
-			if (
-				world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y, transform.position.z)) ||
-				world.CheckForVoxel(new Vector3(transform.position.x + COLLIDER_WIDTH, transform.position.y + 1f, transform.position.z))
-				)
-				return true;
-			else
-				return false;
+			previousPosition.x = Mathf.FloorToInt(currentPosition.x);
+			previousPosition.y = Mathf.FloorToInt(currentPosition.y);
+			previousPosition.z = Mathf.FloorToInt(currentPosition.z);
+
+			step += RAYCAST_STEP;
 		}
+
+		spawnBlockIndicator.gameObject.SetActive(false);
+		destroyBlockIndicator.gameObject.SetActive(false);
 	}
 }
